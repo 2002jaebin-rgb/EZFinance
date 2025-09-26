@@ -1,170 +1,110 @@
 <!doctype html>
 <html lang="ko">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>EZFinance - 기업 재무 상세</title>
-	<meta name="description" content="EZFinance 기업 재무 상세 페이지">
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-	<script src="https://cdn.tailwindcss.com"></script>
-	<script>
-		tailwind.config = {
-			theme: {
-				extend: {
-					fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Noto Sans", "Ubuntu", "Cantarell", "Helvetica Neue", "Arial", "\"Apple Color Emoji\"", "\"Segoe UI Emoji\"", "\"Segoe UI Symbol\""] },
-					colors: {
-						brand: { DEFAULT: "#111827" }
-					}
-				}
-			}
-		}
-	</script>
-	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EZFinance - 기업 재무 상세</title>
+  <meta name="description" content="EZFinance 기업 재무 상세 페이지">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="min-h-screen bg-neutral-50 text-neutral-900 font-sans selection:bg-neutral-900 selection:text-white">
-	<div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-5 md:py-6">
-		<!-- Top Bar -->
-		<div class="flex items-center justify-between">
-			<a href="/" class="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900">
-				<span class="inline-block h-5 w-5 rounded-full bg-neutral-900 text-white grid place-items-center">←</span>
-				<span>홈으로</span>
-			</a>
-			<span class="text-sm text-neutral-500">EZFinance</span>
-		</div>
+<body class="min-h-screen bg-neutral-50 text-neutral-900 font-sans">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-5">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <a href="/" class="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900">
+        <span class="inline-block h-5 w-5 rounded-full bg-neutral-900 text-white grid place-items-center">←</span>
+        <span>홈으로</span>
+      </a>
+      <span class="text-sm text-neutral-500">EZFinance</span>
+    </div>
 
-		<!-- Header Info -->
-		<section class="mt-6">
-			<div class="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
-				<div>
-					<h1 id="companyName" class="text-2xl md:text-3xl font-bold tracking-tight">-</h1>
-					<p class="text-neutral-500 mt-1">
-						<span>종목코드 </span><span id="stockCode" class="font-medium">-</span>
-					</p>
-				</div>
-				<div class="text-neutral-600 text-sm">기준년도 <span id="fiscalYear" class="font-semibold">-</span></div>
-			</div>
-		</section>
+    <!-- Info -->
+    <section class="mt-6">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
+        <div>
+          <h1 id="companyName" class="text-2xl font-bold">-</h1>
+          <p class="text-neutral-500 mt-1">
+            <span>종목코드 </span><span id="stockCode" class="font-medium">-</span>
+          </p>
+        </div>
+        <div class="text-neutral-600 text-sm">기준년도 <span id="fiscalYear" class="font-semibold">-</span></div>
+      </div>
+    </section>
 
-		<!-- Summary Badges -->
-		<section class="mt-5">
-			<div id="summaryBadges" class="flex flex-wrap gap-2"></div>
-		</section>
+    <!-- Cards -->
+    <section class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="rounded-2xl border bg-white p-4"><div class="text-sm text-neutral-500">매출액</div><div id="revenue" class="mt-1 text-2xl font-semibold">-</div></div>
+      <div class="rounded-2xl border bg-white p-4"><div class="text-sm text-neutral-500">영업이익</div><div id="operatingProfit" class="mt-1 text-2xl font-semibold">-</div></div>
+      <div class="rounded-2xl border bg-white p-4"><div class="text-sm text-neutral-500">당기순이익</div><div id="netIncome" class="mt-1 text-2xl font-semibold">-</div></div>
+      <div class="rounded-2xl border bg-white p-4"><div class="text-sm text-neutral-500">자산총계</div><div id="totalAssets" class="mt-1 text-2xl font-semibold">-</div></div>
+      <div class="rounded-2xl border bg-white p-4"><div class="text-sm text-neutral-500">부채총계</div><div id="totalLiabilities" class="mt-1 text-2xl font-semibold">-</div></div>
+      <div class="rounded-2xl border bg-white p-4"><div class="text-sm text-neutral-500">자본총계</div><div id="equity" class="mt-1 text-2xl font-semibold">-</div></div>
+      <div class="rounded-2xl border bg-white p-4"><div class="text-sm text-neutral-500">부채비율</div><div id="debtRatio" class="mt-1 text-2xl font-semibold">-</div></div>
+    </section>
 
-		<!-- Financial Cards -->
-		<section class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-			<div class="rounded-2xl border border-neutral-200 bg-white p-4">
-				<div class="text-sm text-neutral-500">매출액</div>
-				<div id="revenue" class="mt-1 text-2xl font-semibold tracking-tight">-</div>
-			</div>
-			<div class="rounded-2xl border border-neutral-200 bg-white p-4">
-				<div class="text-sm text-neutral-500">영업이익</div>
-				<div id="operatingProfit" class="mt-1 text-2xl font-semibold tracking-tight">-</div>
-			</div>
-			<div class="rounded-2xl border border-neutral-200 bg-white p-4">
-				<div class="text-sm text-neutral-500">당기순이익</div>
-				<div id="netIncome" class="mt-1 text-2xl font-semibold tracking-tight">-</div>
-			</div>
-			<div class="rounded-2xl border border-neutral-200 bg-white p-4">
-				<div class="text-sm text-neutral-500">자산총계</div>
-				<div id="totalAssets" class="mt-1 text-2xl font-semibold tracking-tight">-</div>
-			</div>
-			<div class="rounded-2xl border border-neutral-200 bg-white p-4">
-				<div class="text-sm text-neutral-500">부채총계</div>
-				<div id="totalLiabilities" class="mt-1 text-2xl font-semibold tracking-tight">-</div>
-			</div>
-			<div class="rounded-2xl border border-neutral-200 bg-white p-4">
-				<div class="text-sm text-neutral-500">자본총계</div>
-				<div id="equity" class="mt-1 text-2xl font-semibold tracking-tight">-</div>
-			</div>
-			<div class="rounded-2xl border border-neutral-200 bg-white p-4">
-				<div class="text-sm text-neutral-500">부채비율</div>
-				<div id="debtRatio" class="mt-1 text-2xl font-semibold tracking-tight">-</div>
-			</div>
-		</section>
+    <!-- Chart -->
+    <section class="mt-8">
+      <div class="rounded-2xl border bg-white p-4">
+        <h2 class="text-base font-semibold text-neutral-800">매출/순이익 추이 (3년)</h2>
+        <div class="mt-4">
+          <canvas id="trendChart" height="120"></canvas>
+        </div>
+      </div>
+    </section>
+  </div>
 
-		<!-- Chart Section -->
-		<section class="mt-8">
-			<div class="rounded-2xl border border-neutral-200 bg-white p-4">
-				<h2 class="text-base font-semibold text-neutral-800">매출/순이익 추이 (3년)</h2>
-				<div class="mt-4">
-					<canvas id="trendChart" height="120"></canvas>
-				</div>
-			</div>
-		</section>
+  <script>
+    (async function() {
+      const params = new URLSearchParams(window.location.search);
+      const corpCode = params.get('corp');
+      if (!corpCode) return;
 
-		<!-- Detail Table -->
-		<section class="mt-8">
-			<div class="rounded-2xl border border-neutral-200 bg-white p-4">
-				<h2 class="text-base font-semibold text-neutral-800">재무 요약</h2>
-				<div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-					<div class="flex justify-between bg-neutral-50 rounded-xl p-3"><span class="text-neutral-500">회사명</span><span id="companyNameTable" class="font-medium">-</span></div>
-					<div class="flex justify-between bg-neutral-50 rounded-xl p-3"><span class="text-neutral-500">종목코드</span><span id="stockCodeTable" class="font-medium">-</span></div>
-					<div class="flex justify-between bg-neutral-50 rounded-xl p-3"><span class="text-neutral-500">기준년도</span><span id="fiscalYearTable" class="font-medium">-</span></div>
-					<div class="flex justify-between bg-neutral-50 rounded-xl p-3"><span class="text-neutral-500">부채비율</span><span id="debtRatioTable" class="font-medium">-</span></div>
-				</div>
-			</div>
-		</section>
-	</div>
+      // 최신 연도 데이터 (Cloudflare Functions 호출)
+      const res = await fetch(`/api/financials?corp=${corpCode}&year=2023`);
+      const rawData = await res.json();
 
-	<!-- API 모듈 -->
-	<script src="api.js"></script>
+      // 데이터 파싱
+      const find = (list, name) => {
+        const item = list.find(i => i.account_nm === name);
+        return item ? Number(item.thstrm_amount) : 0;
+      };
+      const revenue = find(rawData.list, "매출액");
+      const op = find(rawData.list, "영업이익");
+      const net = find(rawData.list, "당기순이익");
+      const assets = find(rawData.list, "자산총계");
+      const debt = find(rawData.list, "부채총계");
+      const equity = find(rawData.list, "자본총계");
+      const debtRatio = equity ? ((debt / equity) * 100).toFixed(1) : "-";
 
-	<!-- 메인 스크립트 -->
-	<script>
-		(async function() {
-			const params = new URLSearchParams(window.location.search);
-			const corpCode = params.get('corp'); // index.html에서 전달됨
-			if (!corpCode) return;
+      // UI 채우기
+      document.getElementById('companyName').textContent = corpCode;
+      document.getElementById('stockCode').textContent = corpCode;
+      document.getElementById('fiscalYear').textContent = "2023";
+      document.getElementById('revenue').textContent = revenue.toLocaleString('ko-KR');
+      document.getElementById('operatingProfit').textContent = op.toLocaleString('ko-KR');
+      document.getElementById('netIncome').textContent = net.toLocaleString('ko-KR');
+      document.getElementById('totalAssets').textContent = assets.toLocaleString('ko-KR');
+      document.getElementById('totalLiabilities').textContent = debt.toLocaleString('ko-KR');
+      document.getElementById('equity').textContent = equity.toLocaleString('ko-KR');
+      document.getElementById('debtRatio').textContent = debtRatio + "%";
 
-			// 1. 최신 연도 데이터 가져오기
-			const rawData = await DartAPI.fetchFinancials(corpCode, "2023");
-			const parsed = DartAPI.parseFinancials(rawData);
-
-			// 2. 3년치 추이 가져오기
-			const trend = await DartAPI.fetchFinancialTrend(corpCode, ["2021","2022","2023"]);
-
-			// 3. 화면 채우기
-			document.getElementById('companyName').textContent = corpCode; // TODO: company API로 실제 이름 가져오기
-			document.getElementById('stockCode').textContent = corpCode;
-			document.getElementById('fiscalYear').textContent = "2023";
-
-			document.getElementById('revenue').textContent = Number(parsed.revenue || 0).toLocaleString('ko-KR');
-			document.getElementById('operatingProfit').textContent = Number(parsed.operatingProfit || 0).toLocaleString('ko-KR');
-			document.getElementById('netIncome').textContent = Number(parsed.netIncome || 0).toLocaleString('ko-KR');
-			document.getElementById('totalAssets').textContent = Number(parsed.totalAssets || 0).toLocaleString('ko-KR');
-			document.getElementById('totalLiabilities').textContent = Number(parsed.totalLiabilities || 0).toLocaleString('ko-KR');
-			document.getElementById('equity').textContent = Number(parsed.equity || 0).toLocaleString('ko-KR');
-			document.getElementById('debtRatio').textContent = (parsed.debtRatio || "-") + "%";
-
-			document.getElementById('companyNameTable').textContent = corpCode;
-			document.getElementById('stockCodeTable').textContent = corpCode;
-			document.getElementById('fiscalYearTable').textContent = "2023";
-			document.getElementById('debtRatioTable').textContent = (parsed.debtRatio || "-") + "%";
-
-			// 4. 배지 표시
-			const badgeArea = document.getElementById("summaryBadges");
-			if (parsed.debtRatio > 100) {
-				badgeArea.innerHTML += `<span class="inline-flex items-center gap-2 rounded-full bg-amber-50 text-amber-700 text-xs font-medium px-3 py-1 border border-amber-200">⚠️ 부채비율 높음</span>`;
-			}
-			if (parsed.netIncome > 0) {
-				badgeArea.innerHTML += `<span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium px-3 py-1 border border-emerald-200">✅ 흑자 기업</span>`;
-			}
-
-			// 5. 차트
-			const ctx = document.getElementById('trendChart');
-			new Chart(ctx, {
-				type: 'line',
-				data: {
-					labels: trend.years,
-					datasets: [
-						{ label: '매출(조원)', data: trend.revenue, borderColor: '#111827', fill: true },
-						{ label: '순이익(조원)', data: trend.netIncome, borderColor: '#10b981', fill: true }
-					]
-				}
-			});
-		})();
-	</script>
+      // 간단 차트 (임시: 1년 데이터만 표시)
+      const ctx = document.getElementById('trendChart');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ["2023"],
+          datasets: [
+            { label: '매출(억원)', data: [revenue/1e8], backgroundColor: '#111827' },
+            { label: '순이익(억원)', data: [net/1e8], backgroundColor: '#10b981' }
+          ]
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
