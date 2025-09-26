@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>EZFinance - 초보자를 위한 기업 재무 요약</title>
+	<meta name="description" content="누구나 쉽게 볼 수 있는 기업 재무 요약 서비스, EZFinance">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		// Tailwind config for light, clean aesthetic
+		tailwind.config = {
+			theme: {
+				extend: {
+					fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Noto Sans", "Ubuntu", "Cantarell", "Helvetica Neue", "Arial", "\"Apple Color Emoji\"", "\"Segoe UI Emoji\"", "\"Segoe UI Symbol\""] },
+					colors: {
+						brand: {
+							DEFAULT: "#111827"
+						}
+					}
+				}
+			}
+		}
+	</script>
+</head>
+<body class="min-h-screen bg-neutral-50 text-neutral-900 font-sans selection:bg-neutral-900 selection:text-white">
+	<!-- Page Wrapper -->
+	<div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+		<!-- Header -->
+		<header class="py-5 md:py-6">
+			<div class="grid grid-cols-1 md:grid-cols-3 items-center gap-3 md:gap-4">
+				<!-- Left: Logo -->
+				<div class="flex items-center md:justify-start justify-center">
+					<a href="#" class="text-xl md:text-2xl font-bold tracking-tight">EZFinance</a>
+				</div>
+
+				<!-- Center: Search input -->
+				<div class="order-2 md:order-none">
+					<form class="w-full" action="#" method="get">
+						<label for="q" class="sr-only">기업명 또는 종목코드 입력</label>
+						<input id="q" name="q" type="text" inputmode="search" placeholder="기업명 또는 종목코드 입력" class="w-full rounded-xl border border-neutral-200 bg-white/80 backdrop-blur-sm px-4 py-2.5 md:py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-neutral-900 placeholder:text-neutral-400 text-[15px]" />
+					</form>
+				</div>
+
+				<!-- Right: Search button -->
+				<div class="flex md:justify-end justify-center">
+					<button type="submit" form="" class="inline-flex items-center justify-center rounded-xl bg-neutral-900 text-white px-5 py-2.5 md:py-3 text-sm font-medium shadow-sm hover:bg-neutral-800 active:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/50 transition-colors">검색</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- Main Body -->
+		<main class="pb-12 md:pb-16">
+			<!-- Section 1: Popular Companies -->
+			<section class="mt-2">
+				<h2 class="text-lg md:text-xl font-semibold tracking-tight mb-3">인기 종목</h2>
+				<div class="flex flex-wrap gap-2.5">
+					<!-- Dummy popular tags/buttons -->
+					<button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">삼성전자</button>
+					<button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">카카오</button>
+					<button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">현대차</button>
+					<button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">POSCO</button>
+					<button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">NAVER</button>
+					<button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">LG화학</button>
+				</div>
+			</section>
+
+			<!-- Section 2: Explanation -->
+			<section class="mt-8 md:mt-10">
+				<p class="text-neutral-600 text-[15px] md:text-base">누구나 쉽게 볼 수 있는 기업 재무 요약 서비스입니다.</p>
+			</section>
+		</main>
+
+		<!-- Footer -->
+		<footer class="border-t border-neutral-200 py-6 text-center">
+			<p class="text-xs text-neutral-500">본 서비스는 OPENDART 공공 API를 활용합니다.</p>
+		</footer>
+	</div>
+</body>
+</html>
