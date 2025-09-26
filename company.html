@@ -49,10 +49,7 @@
 
 		<!-- Summary Badges -->
 		<section class="mt-5">
-			<div id="summaryBadges" class="flex flex-wrap gap-2">
-				<span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium px-3 py-1 border border-emerald-200">✅ 순이익 증가</span>
-				<span class="inline-flex items-center gap-2 rounded-full bg-amber-50 text-amber-700 text-xs font-medium px-3 py-1 border border-amber-200">⚠️ 부채비율 높음</span>
-			</div>
+			<div id="summaryBadges" class="flex flex-wrap gap-2"></div>
 		</section>
 
 		<!-- Financial Cards -->
@@ -111,109 +108,75 @@
 		</section>
 	</div>
 
-	<script>
-		(function() {
-			// Utility: format number with commas
-			function formatNumber(n) {
-				if (n === null || n === undefined || n === '-') return '-';
-				const num = Number(n);
-				if (Number.isNaN(num)) return String(n);
-				return num.toLocaleString('ko-KR');
-			}
+	<!-- API 모듈 로드 -->
+	<script src="api.js"></script>
 
-			// Parse URL param: ?corp=00126380
+	<!-- 메인 스크립트 -->
+	<script>
+		(async function() {
+			// URL에서 corp 파라미터 읽기
 			const params = new URLSearchParams(window.location.search);
 			const corpCode = params.get('corp');
+			if (!corpCode) return;
 
-			// Placeholder: you will fetch from OPENDART with corpCode
-			// For now, dummy data keyed by corp code
-			const dummy = {
-				'005930': {
-					companyName: '삼성전자', stockCode: '005930', fiscalYear: '2024',
-					revenue: 260000000000000, operatingProfit: 15000000000000, netIncome: 12000000000000,
-					totalAssets: 420000000000000, totalLiabilities: 160000000000000, capital: 8975140000000,
-					debtRatio: 38.1,
-					trendYears: ['2022', '2023', '2024'], trendRevenue: [240, 250, 260], trendNetIncome: [8, 10, 12]
-				},
-				'035720': {
-					companyName: '카카오', stockCode: '035720', fiscalYear: '2024',
-					revenue: 15000000000000, operatingProfit: 950000000000, netIncome: 700000000000,
-					totalAssets: 46000000000000, totalLiabilities: 22000000000000, capital: 4450000000000,
-					debtRatio: 48.9,
-					trendYears: ['2022', '2023', '2024'], trendRevenue: [13, 14, 15], trendNetIncome: [0.5, 0.6, 0.7]
-				}
-			};
+			// 최신 연도 데이터
+			const rawData = await DartAPI.fetchFinancials(corpCode, "2023");
+			const parsed = DartAPI.parseFinancials(rawData);
 
-			const data = dummy[corpCode] || {
-				companyName: '-', stockCode: corpCode || '-', fiscalYear: '-',
-				revenue: '-', operatingProfit: '-', netIncome: '-',
-				totalAssets: '-', totalLiabilities: '-', capital: '-',
-				debtRatio: '-', trendYears: ['2022','2023','2024'], trendRevenue: [0,0,0], trendNetIncome: [0,0,0]
-			};
+			// 3개년 추이 데이터
+			const trend = await DartAPI.fetchFinancialTrend(corpCode, ["2021","2022","2023"]);
 
-			// Fill placeholders
-			document.getElementById('companyName').textContent = data.companyName;
-			document.getElementById('stockCode').textContent = data.stockCode;
-			document.getElementById('fiscalYear').textContent = data.fiscalYear;
+			// 화면에 표시
+			document.getElementById('companyName').textContent = corpCode; // API에서 회사명 추출 필요
+			document.getElementById('stockCode').textContent = corpCode;
+			document.getElementById('fiscalYear').textContent = "2023";
 
-			document.getElementById('revenue').textContent = formatNumber(data.revenue);
-			document.getElementById('operatingProfit').textContent = formatNumber(data.operatingProfit);
-			document.getElementById('netIncome').textContent = formatNumber(data.netIncome);
-			document.getElementById('totalAssets').textContent = formatNumber(data.totalAssets);
-			document.getElementById('totalLiabilities').textContent = formatNumber(data.totalLiabilities);
-			document.getElementById('capital').textContent = formatNumber(data.capital);
-			document.getElementById('debtRatio').textContent = data.debtRatio === '-' ? '-' : data.debtRatio + '%';
+			document.getElementById('revenue').textContent = Number(parsed.revenue || 0).toLocaleString('ko-KR');
+			document.getElementById('operatingProfit').textContent = Number(parsed.operatingProfit || 0).toLocaleString('ko-KR');
+			document.getElementById('netIncome').textContent = Number(parsed.netIncome || 0).toLocaleString('ko-KR');
+			document.getElementById('totalAssets').textContent = Number(parsed.totalAssets || 0).toLocaleString('ko-KR');
+			document.getElementById('totalLiabilities').textContent = Number(parsed.totalLiabilities || 0).toLocaleString('ko-KR');
+			document.getElementById('capital').textContent = Number(parsed.capital || 0).toLocaleString('ko-KR');
+			document.getElementById('debtRatio').textContent = (parsed.debtRatio || "-") + "%";
 
-			document.getElementById('companyNameTable').textContent = data.companyName;
-			document.getElementById('stockCodeTable').textContent = data.stockCode;
-			document.getElementById('fiscalYearTable').textContent = data.fiscalYear;
-			document.getElementById('debtRatioTable').textContent = document.getElementById('debtRatio').textContent;
+			document.getElementById('companyNameTable').textContent = corpCode;
+			document.getElementById('stockCodeTable').textContent = corpCode;
+			document.getElementById('fiscalYearTable').textContent = "2023";
+			document.getElementById('debtRatioTable').textContent = (parsed.debtRatio || "-") + "%";
 
-			// Chart.js for trend
+			// 경고/배지 예시
+			const badgeArea = document.getElementById("summaryBadges");
+			if (parsed.debtRatio > 100) {
+				badgeArea.innerHTML += `<span class="inline-flex items-center gap-2 rounded-full bg-amber-50 text-amber-700 text-xs font-medium px-3 py-1 border border-amber-200">⚠️ 부채비율 높음</span>`;
+			}
+			if (parsed.netIncome > 0) {
+				badgeArea.innerHTML += `<span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium px-3 py-1 border border-emerald-200">✅ 흑자 기업</span>`;
+			}
+
+			// 차트 그리기
 			const ctx = document.getElementById('trendChart');
-			const chart = new Chart(ctx, {
+			new Chart(ctx, {
 				type: 'line',
 				data: {
-					labels: data.trendYears,
+					labels: trend.years,
 					datasets: [
 						{
 							label: '매출(조원)',
-							data: data.trendRevenue,
+							data: trend.revenue,
 							borderColor: '#111827',
-							backgroundColor: 'rgba(17, 24, 39, 0.08)',
+							backgroundColor: 'rgba(17,24,39,0.08)',
 							tension: 0.25,
-							fill: true,
-							pointRadius: 3,
-							pointBackgroundColor: '#111827'
+							fill: true
 						},
 						{
 							label: '순이익(조원)',
-							data: data.trendNetIncome,
+							data: trend.netIncome,
 							borderColor: '#10b981',
-							backgroundColor: 'rgba(16, 185, 129, 0.12)',
+							backgroundColor: 'rgba(16,185,129,0.12)',
 							tension: 0.25,
-							fill: true,
-							pointRadius: 3,
-							pointBackgroundColor: '#10b981'
+							fill: true
 						}
 					]
-				},
-				options: {
-					responsive: true,
-					maintainAspectRatio: true,
-					scales: {
-						y: {
-							beginAtZero: true,
-							grid: { color: 'rgba(0,0,0,0.06)' }
-						},
-						x: {
-							grid: { display: false }
-						}
-					},
-					plugins: {
-						legend: { display: true, labels: { boxWidth: 12, usePointStyle: true } },
-						tooltip: { enabled: true }
-					}
 				}
 			});
 		})();
