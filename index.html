@@ -36,7 +36,7 @@
 					<a href="#" class="text-xl md:text-2xl font-bold tracking-tight">EZFinance</a>
 				</div>
 
-				<!-- Center: Search input -->
+				<!-- Center: Search input (header) -->
 				<div class="order-2 md:order-none">
 					<form class="w-full" action="#" method="get">
 						<label for="q" class="sr-only">기업명 또는 종목코드 입력</label>
@@ -53,8 +53,23 @@
 
 		<!-- Main Body -->
 		<main class="pb-12 md:pb-16">
+			<!-- Hero: Centered Search with Autocomplete -->
+			<section class="pt-4 md:pt-6">
+				<div class="max-w-xl mx-auto">
+					<h1 class="sr-only">EZ재무 - 검색</h1>
+					<div class="relative">
+						<label for="hero-search" class="sr-only">기업명 또는 종목코드 입력</label>
+						<input id="hero-search" type="text" inputmode="search" placeholder="기업명 또는 종목코드 입력" class="w-full rounded-2xl border border-neutral-200 bg-white px-5 py-3.5 md:py-4 text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-neutral-900 placeholder:text-neutral-400" autocomplete="off" />
+						<!-- Dropdown -->
+						<div id="autocomplete" class="absolute left-0 right-0 mt-2 hidden overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-lg">
+							<ul id="autocomplete-list" class="divide-y divide-neutral-100"></ul>
+						</div>
+					</div>
+				</div>
+			</section>
+
 			<!-- Section 1: Popular Companies -->
-			<section class="mt-2">
+			<section class="mt-8 md:mt-12">
 				<h2 class="text-lg md:text-xl font-semibold tracking-tight mb-3">인기 종목</h2>
 				<div class="flex flex-wrap gap-2.5">
 					<!-- Dummy popular tags/buttons -->
@@ -78,5 +93,83 @@
 			<p class="text-xs text-neutral-500">본 서비스는 OPENDART 공공 API를 활용합니다.</p>
 		</footer>
 	</div>
+
+	<!-- Basic JS: Autocomplete behavior -->
+	<script>
+		(function() {
+			/** Dummy company dataset */
+			const companies = [
+				{ name: "삼성전자", code: "005930", corp_code: "005930" },
+				{ name: "카카오", code: "035720", corp_code: "035720" },
+				{ name: "현대차", code: "005380", corp_code: "005380" },
+				{ name: "POSCO홀딩스", code: "005490", corp_code: "005490" },
+				{ name: "NAVER", code: "035420", corp_code: "035420" },
+				{ name: "LG화학", code: "051910", corp_code: "051910" }
+			];
+
+			const input = document.getElementById('hero-search');
+			const dropdown = document.getElementById('autocomplete');
+			const list = document.getElementById('autocomplete-list');
+
+			function normalize(text) {
+				return (text || '').toString().trim();
+			}
+
+			function filterCompanies(query) {
+				const q = normalize(query);
+				if (!q) return [];
+				const lower = q.toLowerCase();
+				return companies.filter(c => c.name.toLowerCase().includes(lower) || c.code.includes(q)).slice(0, 5);
+			}
+
+			function renderList(items) {
+				list.innerHTML = '';
+				if (!items.length) {
+					dropdown.classList.add('hidden');
+					return;
+				}
+				dropdown.classList.remove('hidden');
+				items.forEach(item => {
+					const li = document.createElement('li');
+					li.className = 'flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-neutral-50';
+					li.innerHTML = `<div class="flex flex-col">
+						<span class="text-sm font-medium text-neutral-900">${item.name}</span>
+						<span class="text-xs text-neutral-500">${item.code}</span>
+					</div>`;
+					li.addEventListener('mousedown', function(e) {
+						// Use mousedown to fire before input blur hides list
+						e.preventDefault();
+						window.location.href = `/company/${item.corp_code}`;
+					});
+					list.appendChild(li);
+				});
+			}
+
+			// Input events
+			input.addEventListener('input', function(e) {
+				const q = e.target.value;
+				const results = filterCompanies(q);
+				renderList(results);
+			});
+
+			// Hide dropdown when clicking outside
+			document.addEventListener('click', function(e) {
+				if (!dropdown.contains(e.target) && e.target !== input) {
+					dropdown.classList.add('hidden');
+				}
+			});
+
+			// Optional: Enter key navigates to first match
+			input.addEventListener('keydown', function(e) {
+				if (e.key === 'Enter') {
+					e.preventDefault();
+					const results = filterCompanies(input.value);
+					if (results.length > 0) {
+						window.location.href = `/company/${results[0].corp_code}`;
+					}
+				}
+			});
+		})();
+	</script>
 </body>
 </html>
