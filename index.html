@@ -139,7 +139,7 @@
 					li.addEventListener('mousedown', function(e) {
 						// Use mousedown to fire before input blur hides list
 						e.preventDefault();
-						window.location.href = `/company/${item.corp_code}`;
+						window.location.href = `company.html?corp=${item.corp_code}`;
 					});
 					list.appendChild(li);
 				});
@@ -165,7 +165,7 @@
 					e.preventDefault();
 					const results = filterCompanies(input.value);
 					if (results.length > 0) {
-						window.location.href = `/company/${results[0].corp_code}`;
+						window.location.href = `company.html?corp=${results[0].corp_code}`;
 					}
 				}
 			});
