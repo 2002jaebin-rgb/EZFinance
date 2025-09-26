@@ -10,7 +10,6 @@
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 	<script src="https://cdn.tailwindcss.com"></script>
 	<script>
-		// Tailwind config for light, clean aesthetic
 		tailwind.config = {
 			theme: {
 				extend: {
@@ -31,20 +30,15 @@
 		<!-- Header -->
 		<header class="py-5 md:py-6">
 			<div class="grid grid-cols-1 md:grid-cols-3 items-center gap-3 md:gap-4">
-				<!-- Left: Logo -->
 				<div class="flex items-center md:justify-start justify-center">
 					<a href="#" class="text-xl md:text-2xl font-bold tracking-tight">EZFinance</a>
 				</div>
-
-				<!-- Center: Search input (header) -->
 				<div class="order-2 md:order-none">
 					<form class="w-full" action="#" method="get">
 						<label for="q" class="sr-only">기업명 또는 종목코드 입력</label>
 						<input id="q" name="q" type="text" inputmode="search" placeholder="기업명 또는 종목코드 입력" class="w-full rounded-xl border border-neutral-200 bg-white/80 backdrop-blur-sm px-4 py-2.5 md:py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-neutral-900 placeholder:text-neutral-400 text-[15px]" />
 					</form>
 				</div>
-
-				<!-- Right: Search button -->
 				<div class="flex md:justify-end justify-center">
 					<button type="submit" form="" class="inline-flex items-center justify-center rounded-xl bg-neutral-900 text-white px-5 py-2.5 md:py-3 text-sm font-medium shadow-sm hover:bg-neutral-800 active:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/50 transition-colors">검색</button>
 				</div>
@@ -60,7 +54,6 @@
 					<div class="relative">
 						<label for="hero-search" class="sr-only">기업명 또는 종목코드 입력</label>
 						<input id="hero-search" type="text" inputmode="search" placeholder="기업명 또는 종목코드 입력" class="w-full rounded-2xl border border-neutral-200 bg-white px-5 py-3.5 md:py-4 text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-neutral-900 placeholder:text-neutral-400" autocomplete="off" />
-						<!-- Dropdown -->
 						<div id="autocomplete" class="absolute left-0 right-0 mt-2 hidden overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-lg">
 							<ul id="autocomplete-list" class="divide-y divide-neutral-100"></ul>
 						</div>
@@ -68,11 +61,17 @@
 				</div>
 			</section>
 
+			<!-- ✅ DART API 테스트 버튼 -->
+			<div class="max-w-xl mx-auto mt-4 text-center">
+				<button id="testApiBtn" class="px-4 py-2 rounded bg-blue-600 text-white text-sm">
+					DART API 테스트
+				</button>
+			</div>
+
 			<!-- Section 1: Popular Companies -->
 			<section class="mt-8 md:mt-12">
 				<h2 class="text-lg md:text-xl font-semibold tracking-tight mb-3">인기 종목</h2>
 				<div class="flex flex-wrap gap-2.5">
-					<!-- Dummy popular tags/buttons -->
 					<button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">삼성전자</button>
 					<button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">카카오</button>
 					<button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">현대차</button>
@@ -94,12 +93,11 @@
 		</footer>
 	</div>
 
-	<!-- Basic JS: Autocomplete behavior -->
+	<!-- Autocomplete JS -->
 	<script>
 		(function() {
-			/** Dummy company dataset */
 			const companies = [
-				{ name: "삼성전자", code: "005930", corp_code: "005930" },
+				{ name: "삼성전자", code: "005930", corp_code: "005930" }, 
 				{ name: "카카오", code: "035720", corp_code: "035720" },
 				{ name: "현대차", code: "005380", corp_code: "005380" },
 				{ name: "POSCO홀딩스", code: "005490", corp_code: "005490" },
@@ -114,14 +112,12 @@
 			function normalize(text) {
 				return (text || '').toString().trim();
 			}
-
 			function filterCompanies(query) {
 				const q = normalize(query);
 				if (!q) return [];
 				const lower = q.toLowerCase();
 				return companies.filter(c => c.name.toLowerCase().includes(lower) || c.code.includes(q)).slice(0, 5);
 			}
-
 			function renderList(items) {
 				list.innerHTML = '';
 				if (!items.length) {
@@ -137,29 +133,22 @@
 						<span class="text-xs text-neutral-500">${item.code}</span>
 					</div>`;
 					li.addEventListener('mousedown', function(e) {
-						// Use mousedown to fire before input blur hides list
 						e.preventDefault();
 						window.location.href = `company.html?corp=${item.corp_code}`;
 					});
 					list.appendChild(li);
 				});
 			}
-
-			// Input events
 			input.addEventListener('input', function(e) {
 				const q = e.target.value;
 				const results = filterCompanies(q);
 				renderList(results);
 			});
-
-			// Hide dropdown when clicking outside
 			document.addEventListener('click', function(e) {
 				if (!dropdown.contains(e.target) && e.target !== input) {
 					dropdown.classList.add('hidden');
 				}
 			});
-
-			// Optional: Enter key navigates to first match
 			input.addEventListener('keydown', function(e) {
 				if (e.key === 'Enter') {
 					e.preventDefault();
@@ -170,6 +159,17 @@
 				}
 			});
 		})();
+	</script>
+
+	<!-- ✅ DART API 테스트 스크립트 -->
+	<script src="api.js"></script>
+	<script>
+	document.getElementById("testApiBtn").addEventListener("click", async () => {
+		const testCorp = "00126380"; // 삼성전자 corp_code
+		const data = await DartAPI.fetchFinancials(testCorp, "2023");
+		console.log("DART API 응답:", data);
+		alert("API 호출 완료! 개발자 도구 콘솔(F12)에서 확인하세요.");
+	});
 	</script>
 </body>
 </html>
