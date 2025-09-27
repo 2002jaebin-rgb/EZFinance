@@ -11,7 +11,7 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !DART_API_KEY) {
 const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 // 1) CORPCODE.zip 가져오기
-const zipUrl = `https://opendart.fss.or.kr/api/corpCode.xml?crtfc_key=${DART_API_KEY}`;
+const zipUrl = `https://opendart.fss.or.kr/api/corpCode.zip?crtfc_key=${DART_API_KEY}`;
 console.log("Downloading:", zipUrl);
 const res = await fetch(zipUrl);
 if (!res.ok) {
