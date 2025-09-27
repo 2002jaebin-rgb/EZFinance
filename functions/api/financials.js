@@ -72,7 +72,6 @@ export async function onRequest(context) {
       data = { raw: text };
     }
 
-    // 응답이 또 에러 페이지라면 에러로 처리
     if (
       typeof data === "string" && /error1\.html/i.test(data)
       || (data?.status && data.status !== "000" && !data.list)
