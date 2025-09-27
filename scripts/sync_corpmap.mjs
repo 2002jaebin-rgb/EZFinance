@@ -30,16 +30,28 @@ if (!xmlEntry) {
 const xml = xmlEntry.getData().toString("utf-8");
 
 // 3) XML 파싱
-const parser = new XMLParser({ ignoreAttributes: false, trimValues: true });
+const parser = new XMLParser({
+  ignoreAttributes: false,
+  trimValues: true,
+  textNodeName: "#text"
+});
 const parsed = parser.parse(xml);
 const lists = parsed?.result?.list;
 const arr = Array.isArray(lists) ? lists : [lists];
 
+function getText(node) {
+  if (node == null) return "";
+  if (typeof node === "string") return node;
+  if (typeof node === "object" && "#text" in node) return node["#text"];
+  return "";
+}
+
 const rows = arr.map(x => ({
-  corp_code: (x.corp_code || "").trim(),
-  stock_code: (x.stock_code || "").trim() || null,
-  name: (x.corp_name || "").trim()
+  corp_code: getText(x.corp_code).trim(),
+  stock_code: getText(x.stock_code).trim() || null,
+  name: getText(x.corp_name).trim()
 })).filter(r => r.corp_code && r.name);
+
 
 // 4) 배치 업서트
 console.log(`Upserting ${rows.length} rows...`);
