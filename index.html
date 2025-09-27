@@ -19,16 +19,17 @@
           <a href="/" class="text-xl md:text-2xl font-bold tracking-tight">EZFinance</a>
         </div>
         <div class="order-2 md:order-none">
-          <form class="w-full" action="#" method="get">
-            <label for="q" class="sr-only">기업명 또는 종목코드 입력</label>
+          <form class="w-full" action="#" method="get" onsubmit="return false;">
+            <label for="hero-search" class="sr-only">기업명 또는 종목코드 입력</label>
             <input id="hero-search" name="q" type="text" inputmode="search"
               placeholder="기업명 또는 종목코드 입력"
               class="w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 shadow-sm
-                     focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-neutral-900" />
+                     focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-neutral-900"
+              autocomplete="off" />
           </form>
         </div>
         <div class="flex md:justify-end justify-center">
-          <button type="submit" form=""
+          <button id="searchBtn" type="button"
             class="inline-flex items-center justify-center rounded-xl bg-neutral-900 text-white
                    px-5 py-2.5 text-sm font-medium shadow-sm hover:bg-neutral-800
                    active:bg-neutral-900 focus:outline-none">
@@ -68,34 +69,28 @@
         </button>
       </div>
 
-      <!-- Popular Companies (데모용) -->
+      <!-- Popular Companies -->
       <section class="mt-8 md:mt-12">
         <h2 class="text-lg md:text-xl font-semibold tracking-tight mb-3">인기 종목</h2>
-        <div class="flex flex-wrap gap-2.5">
+        <div class="flex flex-wrap gap-2.5" id="popular">
           <button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white
-                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">
-            삼성전자
-          </button>
+                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition"
+                  data-name="삼성전자">삼성전자</button>
           <button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white
-                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">
-            카카오
-          </button>
+                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition"
+                  data-name="카카오">카카오</button>
           <button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white
-                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">
-            현대차
-          </button>
+                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition"
+                  data-name="현대차">현대차</button>
           <button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white
-                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">
-            POSCO
-          </button>
+                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition"
+                  data-name="POSCO홀딩스">POSCO홀딩스</button>
           <button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white
-                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">
-            NAVER
-          </button>
+                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition"
+                  data-name="NAVER">NAVER</button>
           <button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white
-                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">
-            LG화학
-          </button>
+                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition"
+                  data-name="LG화학">LG화학</button>
         </div>
       </section>
 
@@ -113,24 +108,35 @@
     </footer>
   </div>
 
-  <!-- Autocomplete: corpmap.json 사용 -->
+  <!-- Autocomplete + Popular + Test -->
   <script>
   (async function() {
-    // 1) corpmap.json 불러오기
-    let mapping = [];
-    try {
-      const res = await fetch('/data/corpmap.json', { cache: 'no-store' });
-      mapping = await res.json();
-    } catch (e) {
-      console.warn('corpmap.json 로드 실패:', e);
-      mapping = [];
-    }
-
     const input = document.getElementById('hero-search');
     const dropdown = document.getElementById('autocomplete');
     const list = document.getElementById('autocomplete-list');
-    if (!input) return;
+    const searchBtn = document.getElementById('searchBtn');
 
+    // 1) corpmap.json 로드 (실패 시 fallback 사용)
+    let mapping = [];
+    const fallback = [
+      { name: "삼성전자", stock_code: "005930", corp_code: "00126380" },
+      { name: "카카오", stock_code: "035720", corp_code: "00139042" },
+      { name: "현대차", stock_code: "005380", corp_code: "00164742" },
+      { name: "POSCO홀딩스", stock_code: "005490", corp_code: "00126361" },
+      { name: "NAVER", stock_code: "035420", corp_code: "00129090" },
+      { name: "LG화학", stock_code: "051910", corp_code: "00164779" }
+    ];
+    try {
+      const res = await fetch('/data/corpmap.json', { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP '+res.status);
+      mapping = await res.json();
+      if (!Array.isArray(mapping) || mapping.length === 0) mapping = fallback;
+    } catch (e) {
+      console.warn('corpmap.json 로드 실패, fallback 사용:', e);
+      mapping = fallback;
+    }
+
+    // 2) 필터링/렌더 함수
     function filter(q) {
       const s = (q || '').trim().toLowerCase();
       if (!s) return [];
@@ -144,6 +150,7 @@
       list.innerHTML = '';
       if (!items.length) { dropdown.classList.add('hidden'); return; }
       dropdown.classList.remove('hidden');
+
       items.forEach(item => {
         const li = document.createElement('li');
         li.className = 'flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-neutral-50';
@@ -160,12 +167,27 @@
       });
     }
 
-    input.addEventListener('input', (e) => render(filter(e.target.value)));
+    // 3) 이벤트 바인딩
+    input.addEventListener('input', (e) => {
+      const val = e.target.value;
+      const items = filter(val);
+      render(items);
+    });
+
+    // 한국어 IME 입력 시 조합 종료 후에도 렌더되도록
+    input.addEventListener('compositionend', (e) => {
+      const items = filter(e.target.value);
+      render(items);
+    });
+
+    // 바깥 클릭 시 닫기
     document.addEventListener('click', (e) => {
       if (!dropdown.contains(e.target) && e.target !== input) {
         dropdown.classList.add('hidden');
       }
     });
+
+    // Enter로 첫 번째 이동
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -175,6 +197,29 @@
         }
       }
     });
+
+    // 검색 버튼 클릭 시도
+    searchBtn.addEventListener('click', () => {
+      const results = filter(input.value);
+      if (results.length > 0) {
+        window.location.href = `company.html?corp=${results[0].corp_code}`;
+      } else {
+        alert('검색 결과가 없습니다. (예: 삼성전자, 005930)');
+      }
+    });
+
+    // 4) 인기 종목 클릭 → corp_code 찾아 이동
+    const popular = document.getElementById('popular');
+    if (popular) {
+      popular.querySelectorAll('button[data-name]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const name = btn.getAttribute('data-name');
+          const hit = mapping.find(m => m.name === name);
+          if (hit) window.location.href = `company.html?corp=${hit.corp_code}`;
+          else alert('매핑에서 회사를 찾을 수 없습니다.');
+        });
+      });
+    }
   })();
   </script>
 
