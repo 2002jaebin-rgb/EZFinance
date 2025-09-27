@@ -9,10 +9,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS v2 (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="min-h-screen bg-neutral-50 text-neutral-900 font-sans">
   <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-    <!-- Header (검색창 제거, 로고만) -->
+    <!-- Header -->
     <header class="py-5 md:py-6">
       <div class="flex items-center justify-between">
         <a href="/" class="text-xl md:text-2xl font-bold tracking-tight">EZFinance</a>
@@ -97,16 +99,29 @@
     </footer>
   </div>
 
-  <!-- Autocomplete + Popular + Test -->
+  <!-- App Script (Supabase 검색 + Fallback + 인기종목 이동 + Test) -->
   <script>
-  (async function() {
+  (function() {
+    // TODO: 아래 2개 값을 본인 Supabase 프로젝트 정보로 교체
+    const SUPABASE_URL = "https://ruvcwkghdommvbzhshtl.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1dmN3a2doZG9tbXZiemhzaHRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg5MTAyMzQsImV4cCI6MjA3NDQ4NjIzNH0.71Sn9Qu_cOfUmPNSfBSRmuFoaqCzUU7yU6zmwotJnyY";
+
+    // Supabase 클라이언트 (익명키 사용: 읽기 전용)
+    let supabaseClient = null;
+    try {
+      if (SUPABASE_URL.startsWith("https://") && SUPABASE_ANON_KEY.length > 20) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch(e) {
+      console.warn("Supabase 초기화 실패:", e);
+    }
+
     const input = document.getElementById('search');
     const dropdown = document.getElementById('autocomplete');
     const list = document.getElementById('autocomplete-list');
     const searchBtn = document.getElementById('searchBtn');
 
-    // corpmap.json 로드 (실패 시 fallback 사용)
-    let mapping = [];
+    // Fallback 데이터 (Supabase 실패 시)
     const fallback = [
       { name: "삼성전자", stock_code: "005930", corp_code: "00126380" },
       { name: "카카오", stock_code: "035720", corp_code: "00139042" },
@@ -115,25 +130,48 @@
       { name: "NAVER", stock_code: "035420", corp_code: "00129090" },
       { name: "LG화학", stock_code: "051910", corp_code: "00164779" }
     ];
-    try {
-      const res = await fetch('/data/corpmap.json', { cache: 'no-store' });
-      if (!res.ok) throw new Error('HTTP '+res.status);
-      mapping = await res.json();
-      if (!Array.isArray(mapping) || mapping.length === 0) mapping = fallback;
-    } catch (e) {
-      console.warn('corpmap.json 로드 실패, fallback 사용:', e);
-      mapping = fallback;
+
+    async function supabaseSearch(q) {
+      if (!supabaseClient || !q) return [];
+      // v2 쿼리: or 필터로 name/stock_code 동시 검색
+      // 참고: name.ilike.%q%,stock_code.ilike.%q%
+      const orFilter = `name.ilike.%${q}%,stock_code.ilike.%${q}%`;
+      const { data, error } = await supabaseClient
+        .from("corpmap")
+        .select("corp_code, stock_code, name")
+        .or(orFilter)
+        .limit(10);
+
+      if (error) {
+        console.warn("Supabase 검색 에러:", error);
+        return [];
+      }
+      return data || [];
     }
 
-    // 필터 & 렌더
-    function filter(q) {
+    // 필요 시 로컬 corpmap.json도 사용 (Supabase 실패/네트워크 이슈 대비)
+    async function localSearch(q) {
+      const res = await fetch('/data/corpmap.json', { cache: 'no-store' }).catch(() => null);
+      let mapping = Array.isArray(fallback) ? fallback : [];
+      if (res && res.ok) {
+        try { mapping = await res.json(); } catch {}
+      }
       const s = (q || '').trim().toLowerCase();
       if (!s) return [];
       return mapping.filter(m =>
         (m.name || '').toLowerCase().includes(s) ||
         (m.stock_code || '').includes(q)
-      ).slice(0, 8);
+      ).slice(0, 10);
     }
+
+    async function search(q) {
+      // 1) Supabase 우선
+      const sb = await supabaseSearch(q);
+      if (sb && sb.length) return sb;
+      // 2) 실패하면 로컬 fallback
+      return localSearch(q);
+    }
+
     function render(items) {
       list.innerHTML = '';
       if (!items.length) { dropdown.classList.add('hidden'); return; }
@@ -144,7 +182,7 @@
         li.innerHTML = `
           <div class="flex flex-col">
             <span class="text-sm font-medium text-neutral-900">${item.name}</span>
-            <span class="text-xs text-neutral-500">${item.stock_code} · corp:${item.corp_code}</span>
+            <span class="text-xs text-neutral-500">${item.stock_code || '-'} · corp:${item.corp_code}</span>
           </div>`;
         li.addEventListener('mousedown', (e) => {
           e.preventDefault();
@@ -155,24 +193,31 @@
     }
 
     // 이벤트
-    input.addEventListener('input', (e) => render(filter(e.target.value)));
-    input.addEventListener('compositionend', (e) => render(filter(e.target.value)));
+    input.addEventListener('input', async (e) => {
+      const q = e.target.value;
+      const items = await search(q);
+      render(items);
+    });
+    input.addEventListener('compositionend', async (e) => {
+      const items = await search(e.target.value);
+      render(items);
+    });
     document.addEventListener('click', (e) => {
       if (!dropdown.contains(e.target) && e.target !== input) {
         dropdown.classList.add('hidden');
       }
     });
-    input.addEventListener('keydown', (e) => {
+    input.addEventListener('keydown', async (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        const results = filter(input.value);
+        const results = await search(input.value);
         if (results.length > 0) {
           window.location.href = `company.html?corp=${results[0].corp_code}`;
         }
       }
     });
-    searchBtn.addEventListener('click', () => {
-      const results = filter(input.value);
+    searchBtn.addEventListener('click', async () => {
+      const results = await search(input.value);
       if (results.length > 0) {
         window.location.href = `company.html?corp=${results[0].corp_code}`;
       } else {
@@ -180,29 +225,35 @@
       }
     });
 
-    // 인기 종목 클릭 → 이동
+    // 인기 종목 클릭 → Supabase에서 corp_code 찾고 이동 (fallback 포함)
     const popular = document.getElementById('popular');
     if (popular) {
       popular.querySelectorAll('button[data-name]').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
           const name = btn.getAttribute('data-name');
-          const hit = mapping.find(m => m.name === name);
+          let hit = null;
+          if (supabaseClient) {
+            const { data } = await supabaseClient
+              .from("corpmap").select("corp_code,name").eq("name", name).limit(1);
+            hit = (data && data[0]) || null;
+          }
+          if (!hit) {
+            hit = fallback.find(m => m.name === name) || null;
+          }
           if (hit) window.location.href = `company.html?corp=${hit.corp_code}`;
           else alert('매핑에서 회사를 찾을 수 없습니다.');
         });
       });
     }
-  })();
-  </script>
 
-  <!-- Test API 버튼 -->
-  <script>
-  document.getElementById("testApiBtn").addEventListener("click", async () => {
-    const res = await fetch(`/api/financials?corp=00126380&year=2023`);
-    const data = await res.json();
-    console.log("API 응답:", data);
-    alert("API 호출 완료! 콘솔(F12)에서 확인하세요.");
-  });
+    // Test 버튼 (그대로 유지)
+    document.getElementById("testApiBtn").addEventListener("click", async () => {
+      const res = await fetch(`/api/financials?corp=00126380&year=2023`);
+      const data = await res.json();
+      console.log("API 응답:", data);
+      alert("API 호출 완료! 콘솔(F12)에서 확인하세요.");
+    });
+  })();
   </script>
 </body>
 </html>
