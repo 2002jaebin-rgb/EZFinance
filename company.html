@@ -24,13 +24,19 @@
     <!-- ✅ 재무 정보 섹션 -->
     <section id="financials" class="mt-8">
       <h2 class="text-xl font-bold mb-4">재무 정보</h2>
-      <div id="financials-container" class="grid grid-cols-2 gap-4">
+      <div id="financials-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- 카드 자동 추가 -->
       </div>
     </section>
   </div>
 
   <script>
+  // 📌 숫자 포맷 함수
+  function formatNumber(val) {
+    if (!val) return "-";
+    return Number(val.replace(/,/g, "")).toLocaleString() + " 원";
+  }
+
   // 📌 재무정보 불러오기
   async function loadFinancials(corp) {
     const year = new Date().getFullYear() - 1;
@@ -43,12 +49,28 @@
     const container = document.getElementById("financials-container");
     container.innerHTML = "";
 
-    for (const [key, value] of Object.entries(data.summary)) {
+    for (const [key, values] of Object.entries(data.summary)) {
       const card = document.createElement("div");
       card.className = "p-4 bg-white rounded shadow";
+
       card.innerHTML = `
-        <h3 class="font-semibold">${key}</h3>
-        <p class="text-lg">${Number(value || 0).toLocaleString()} 원</p>
+        <h3 class="font-semibold mb-2">${key}</h3>
+        <table class="w-full text-sm">
+          <thead>
+            <tr>
+              <th class="text-left">당기</th>
+              <th class="text-left">전기</th>
+              <th class="text-left">전전기</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${formatNumber(values.당기)}</td>
+              <td>${formatNumber(values.전기)}</td>
+              <td>${formatNumber(values.전전기)}</td>
+            </tr>
+          </tbody>
+        </table>
       `;
       container.appendChild(card);
     }
