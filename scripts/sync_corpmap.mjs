@@ -27,7 +27,9 @@ console.log("ℹ️ Content-Type:", ct);
 const buf = Buffer.from(await res.arrayBuffer());
 
 // 2) 응답이 ZIP이 맞는지 확인
-if (!ct.includes("zip") && !ct.includes("octet-stream")) {
+// ZIP 여부는 시그니처로 판별
+const isZip = buf.slice(0, 2).toString() === "PK";
+if (!isZip) {
   console.error("❌ Response is not a zip file. First 500 chars:");
   console.error(buf.toString("utf-8").slice(0, 500));
   process.exit(1);
