@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>EZFinance - 초보자를 위한 기업 재무 요약</title>
-  <meta name="description" content="누구나 쉽게 볼 수 있는 기업 재무 요약 서비스, EZFinance">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="description" content="누구나 쉽게 볼 수 있는 기업 재무 요약 서비스, EZFinance" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-neutral-50 text-neutral-900 font-sans">
@@ -16,42 +16,95 @@
     <header class="py-5 md:py-6">
       <div class="grid grid-cols-1 md:grid-cols-3 items-center gap-3 md:gap-4">
         <div class="flex items-center md:justify-start justify-center">
-          <a href="#" class="text-xl md:text-2xl font-bold tracking-tight">EZFinance</a>
+          <a href="/" class="text-xl md:text-2xl font-bold tracking-tight">EZFinance</a>
         </div>
         <div class="order-2 md:order-none">
           <form class="w-full" action="#" method="get">
             <label for="q" class="sr-only">기업명 또는 종목코드 입력</label>
-            <input id="q" name="q" type="text" inputmode="search" placeholder="기업명 또는 종목코드 입력" class="w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-neutral-900" />
+            <input id="hero-search" name="q" type="text" inputmode="search"
+              placeholder="기업명 또는 종목코드 입력"
+              class="w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 shadow-sm
+                     focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-neutral-900" />
           </form>
         </div>
         <div class="flex md:justify-end justify-center">
-          <button type="submit" form="" class="inline-flex items-center justify-center rounded-xl bg-neutral-900 text-white px-5 py-2.5 text-sm font-medium shadow-sm hover:bg-neutral-800 active:bg-neutral-900 focus:outline-none">검색</button>
+          <button type="submit" form=""
+            class="inline-flex items-center justify-center rounded-xl bg-neutral-900 text-white
+                   px-5 py-2.5 text-sm font-medium shadow-sm hover:bg-neutral-800
+                   active:bg-neutral-900 focus:outline-none">
+            검색
+          </button>
         </div>
       </div>
     </header>
 
-    <!-- Main Body -->
+    <!-- Main -->
     <main class="pb-12 md:pb-16">
-      <!-- Hero: Search -->
+      <!-- Hero Search -->
       <section class="pt-4 md:pt-6">
         <div class="max-w-xl mx-auto">
           <h1 class="sr-only">EZ재무 - 검색</h1>
           <div class="relative">
             <label for="hero-search" class="sr-only">기업명 또는 종목코드 입력</label>
-            <input id="hero-search" type="text" inputmode="search" placeholder="기업명 또는 종목코드 입력" class="w-full rounded-2xl border border-neutral-200 bg-white px-5 py-3.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-neutral-900" autocomplete="off" />
-            <div id="autocomplete" class="absolute left-0 right-0 mt-2 hidden overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-lg">
+            <input id="hero-search" type="text" inputmode="search"
+              placeholder="기업명 또는 종목코드 입력"
+              class="w-full rounded-2xl border border-neutral-200 bg-white px-5 py-3.5 shadow-sm
+                     focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-neutral-900"
+              autocomplete="off" />
+            <div id="autocomplete"
+              class="absolute left-0 right-0 mt-2 hidden overflow-hidden rounded-2xl border
+                     border-neutral-200 bg-white shadow-lg">
               <ul id="autocomplete-list" class="divide-y divide-neutral-100"></ul>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ✅ DART API 테스트 버튼 -->
+      <!-- DART API 테스트 버튼 -->
       <div class="max-w-xl mx-auto mt-4 text-center">
-        <button id="testApiBtn" class="px-4 py-2 rounded bg-blue-600 text-white text-sm">
+        <button id="testApiBtn"
+          class="px-4 py-2 rounded bg-blue-600 text-white text-sm">
           DART API 테스트
         </button>
       </div>
+
+      <!-- Popular Companies -->
+      <section class="mt-8 md:mt-12">
+        <h2 class="text-lg md:text-xl font-semibold tracking-tight mb-3">인기 종목</h2>
+        <div class="flex flex-wrap gap-2.5">
+          <button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white
+                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">
+            삼성전자
+          </button>
+          <button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white
+                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">
+            카카오
+          </button>
+          <button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white
+                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">
+            현대차
+          </button>
+          <button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white
+                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">
+            POSCO
+          </button>
+          <button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white
+                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">
+            NAVER
+          </button>
+          <button class="px-3.5 py-2 rounded-full border border-neutral-200 bg-white
+                         hover:border-neutral-300 hover:bg-neutral-50 text-sm shadow-sm transition">
+            LG화학
+          </button>
+        </div>
+      </section>
+
+      <!-- Explanation -->
+      <section class="mt-8 md:mt-10">
+        <p class="text-neutral-600 text-[15px] md:text-base">
+          누구나 쉽게 볼 수 있는 기업 재무 요약 서비스입니다.
+        </p>
+      </section>
     </main>
 
     <!-- Footer -->
@@ -60,14 +113,79 @@
     </footer>
   </div>
 
-  <!-- JS -->
+  <!-- Autocomplete: corpmap.json 사용 -->
   <script>
-    document.getElementById("testApiBtn").addEventListener("click", async () => {
-      const res = await fetch(`/api/financials?corp=00126380&year=2023`);
-      const data = await res.json();
-      console.log("API 응답:", data);
-      alert("API 호출 완료! 콘솔(F12) 확인하세요.");
+  (async function() {
+    // 1) corpmap.json 불러오기
+    let mapping = [];
+    try {
+      const res = await fetch('/data/corpmap.json', { cache: 'no-store' });
+      mapping = await res.json();
+    } catch (e) {
+      console.warn('corpmap.json 로드 실패:', e);
+      mapping = [];
+    }
+
+    const input = document.getElementById('hero-search');
+    const dropdown = document.getElementById('autocomplete');
+    const list = document.getElementById('autocomplete-list');
+    if (!input) return;
+
+    function filter(q) {
+      const s = (q || '').trim().toLowerCase();
+      if (!s) return [];
+      return mapping.filter(m =>
+        (m.name || '').toLowerCase().includes(s) ||
+        (m.stock_code || '').includes(q)
+      ).slice(0, 8);
+    }
+
+    function render(items) {
+      list.innerHTML = '';
+      if (!items.length) { dropdown.classList.add('hidden'); return; }
+      dropdown.classList.remove('hidden');
+      items.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-neutral-50';
+        li.innerHTML = `
+          <div class="flex flex-col">
+            <span class="text-sm font-medium text-neutral-900">${item.name}</span>
+            <span class="text-xs text-neutral-500">${item.stock_code} · corp:${item.corp_code}</span>
+          </div>`;
+        li.addEventListener('mousedown', e => {
+          e.preventDefault();
+          window.location.href = \`company.html?corp=\${item.corp_code}\`;
+        });
+        list.appendChild(li);
+      });
+    }
+
+    input.addEventListener('input', e => render(filter(e.target.value)));
+    document.addEventListener('click', e => {
+      if (!dropdown.contains(e.target) && e.target !== input) {
+        dropdown.classList.add('hidden');
+      }
     });
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const results = filter(input.value);
+        if (results.length > 0) {
+          window.location.href = \`company.html?corp=\${results[0].corp_code}\`;
+        }
+      }
+    });
+  })();
+  </script>
+
+  <!-- Test API 버튼 -->
+  <script>
+  document.getElementById("testApiBtn").addEventListener("click", async () => {
+    const res = await fetch(`/api/financials?corp=00126380&year=2023`);
+    const data = await res.json();
+    console.log("API 응답:", data);
+    alert("API 호출 완료! 콘솔(F12)에서 확인하세요.");
+  });
   </script>
 </body>
 </html>
