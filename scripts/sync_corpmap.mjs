@@ -21,12 +21,8 @@ if (!res.ok) {
   process.exit(1);
 }
 
-const ct = res.headers.get("content-type") || "";
-console.log("ℹ️ Content-Type:", ct);
-
 const buf = Buffer.from(await res.arrayBuffer());
 
-// 2) 응답이 ZIP이 맞는지 확인
 // ZIP 여부는 시그니처로 판별
 const isZip = buf.slice(0, 2).toString() === "PK";
 if (!isZip) {
@@ -35,20 +31,33 @@ if (!isZip) {
   process.exit(1);
 }
 
-// 3) ZIP 해제 → XML 추출
+// 2) ZIP 해제 → 파일 목록 출력
 const zip = new AdmZip(buf);
-const xmlEntry = zip.getEntries().find(e => e.entryName.toLowerCase().endsWith(".xml"));
+const entries = zip.getEntries();
+console.log("📂 ZIP entries found:", entries.map(e => e.entryName));
+
+const xmlEntry = entries.find(e => e.entryName.toUpperCase().endsWith(".XML"));
 if (!xmlEntry) {
   console.error("❌ No XML file found inside zip.");
   process.exit(1);
 }
 const xml = xmlEntry.getData().toString("utf-8");
+console.log("ℹ️ First 300 chars of XML:", xml.slice(0, 300));
 
-// 4) XML 파싱
-const parser = new XMLParser({ ignoreAttributes: false, trimValues: true, textNodeName: "#text" });
+// 3) XML 파싱
+const parser = new XMLParser({ ignoreAttributes: false, trimValues: true });
 const parsed = parser.parse(xml);
+console.log("🔎 Parsed root keys:", Object.keys(parsed));
+
 const lists = parsed?.result?.list;
+if (!lists) {
+  console.error("❌ parsed.result.list not found. Full root:", JSON.stringify(parsed, null, 2).slice(0, 1000));
+  process.exit(1);
+}
+
 const arr = Array.isArray(lists) ? lists : [lists];
+console.log(`📊 Parsed list count: ${arr.length}`);
+console.log("🔎 Sample row:", arr[0]);
 
 function getText(node) {
   if (node == null) return "";
@@ -63,12 +72,12 @@ const rows = arr.map(x => ({
   name: getText(x.corp_name).trim()
 })).filter(r => r.corp_code && r.name);
 
-console.log(`📊 Parsed rows: ${rows.length}`);
+console.log(`✅ Final rows ready: ${rows.length}`);
 if (rows.length > 0) {
-  console.log("🔎 Sample:", rows.slice(0, 3));
+  console.log("🔎 Sample rows:", rows.slice(0, 3));
 }
 
-// 5) Supabase 업서트
+// 4) Supabase 업서트
 if (rows.length === 0) {
   console.error("❌ No rows to upsert. Stopping.");
   process.exit(1);
